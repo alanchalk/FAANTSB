@@ -34,23 +34,65 @@ A data frame with 2,696,313 rows and 49 columns:
 
 }
 
-\item{street2_ind}{}
-\item{city}{}
-\item{state}{}
-\item{zip_code}{}
-\item{region}{}
-\item{county}{}
-\item{country}{}
-\item{nu_registered}{}
-\item{co_ownership}{}
-\item{nu_n_number}{}
-\item{co_owners_num}{}
+\item{street2_ind}{0/1 indicator of whether or not there is second street line in address}
+\item{city}{The city name which appears on the Application for Registration, AC Form 8050-1 or the latest address reported}
+\item{state}{The state name which appears on the Application for Registration, AC Form 8050-1 or the latest address reported.}
+\item{zip_code}{The postal Zip Code which appears on the Application for Registration, AC Form 8050-1 or the latest address reported.}
+\describe{
+\item{region}{A character column indicating the region. The region codes are as follows (blanks in original data are replaced with X and may be derivable from city):
+\itemize{
+\item \code{1}: Eastern
+\item \code{2}: Southwestern
+\item \code{3}: Central
+\item \code{4}: Western-Pacific
+\item \code{5}: Alaskan
+\item \code{7}: Southern
+\item \code{8}: European
+\item \code{C}: Great Lakes
+\item \code{E}: New England
+\item \code{S}: Northwest Mountain
+}
+}
+\item{county}{A code representing the county which appears on the Application for Registration.}
+\item{country}{A code representing the country which appears on the Application for Registration.}
+\item{nu_registered}{A derived field: The number of aircraft registered to this owner}
+\item{co_owners_num}{A derived field: The number of co-owners}
+\item{co_ownership}{A derived field: Whether or not the aircraft is co-onwed}
+\item{nu_n_number}{A derived field: The number of time an n_number appears in a data source}
 \item{cert_issue_date}{}
 \item{air_worth_date}{}
 \item{expiration_date}{}
 \item{last_action_date}{}
-\item{airworthiness}{}
-\item{operation}{}
+\describe{
+\item{airworthiness}{The airworthiness certificate class which is reported on the Application for Airworthiness, FAA Form 8130-6:
+\itemize{
+\item \code{1}: Standard
+\item \code{2}: Limited
+\item \code{3}: Restricted
+\item \code{4}: Experimental
+\item \code{5}: Provisional
+\item \code{6}: Multiple
+\item \code{7}: Primary
+\item \code{8}: Special Flight Permit
+\item \code{9}: Light Sport
+}
+}
+
+\describe{
+\item{operation}{Based on the approved operations reported on the Application for Airworthiness, FAA Form 8130-6.  There can be up to 6, only one is chosen:
+\itemize{
+\item \code{1}: Standard
+\item \code{2}: Limited
+\item \code{3}: Restricted
+\item \code{4}: Experimental
+\item \code{5}: Provisional
+\item \code{6}: Multiple
+\item \code{7}: Primary
+\item \code{8}: Special Flight Permit
+\item \code{9}: Light Sport
+}
+}
+
 \item{year_mfr}{}
 \item{faa_acft_make}{}
 \item{faa_acft_model}{}

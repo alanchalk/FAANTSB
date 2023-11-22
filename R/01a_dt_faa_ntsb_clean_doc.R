@@ -82,24 +82,67 @@
 #'   }
 #'
 #' \describe{
-#'   \item{operation}{Based on the approved operations reported on the Application for Airworthiness, FAA Form 8130-6.  There can be up to 6, only one is chosen:
+#'   \item{operation}{For some airworthiness codes there is more detail about the operation.  There can be up to 6 operations, only one is chosen:
 #'     \itemize{
 #'       \item \code{1}: Standard
+#'         \itemize{
+#'           \item \code{N}: Normal
+#'           \item \code{U}: Utility
+#'           \item \code{A}: Acrobatic
+#'           \item \code{T}: Transport
+#'           \item \code{G}: Glider
+#'           \item \code{B}: Balloon
+#'           \item \code{C}: Commuter
+#'           \item \code{X}: Other or blank
+#'         }
 #'       \item \code{2}: Limited
+#'         \itemize{
+#'           \item \code{X}: No further detail within limited.  All coded to X
+#'         }
 #'       \item \code{3}: Restricted
+#'          \itemize{
+#'            \item \code{0}: Other
+#'            \item \code{1}: Agriculture and Pest Control
+#'            \item \code{2}: Aerial Surveying
+#'            \item \code{3}: Aerial Advertising
+#'            \item \code{4}: Forest
+#'            \item \code{5}: Patrolling
+#'            \item \code{6}: Weather Control
+#'            \item \code{7}: Carriage of Cargo
+#'          }
 #'       \item \code{4}: Experimental
-#'       \item \code{5}: Provisional
+#'         \itemize{
+#'           \item \code{X}: Limited further detail in FAA so all coded to X
+#'         }
 #'       \item \code{6}: Multiple
+#'         \itemize{
+#'           \item Same codes as code 3, restricted
+#'         }
 #'       \item \code{7}: Primary
+#'         \itemize{
+#'           \item \code{X}: Very few of these (split between R&D and amateur) all coded to X
+#'         }
 #'       \item \code{8}: Special Flight Permit
+#'         \itemize{
+#'           \item \code{X}: Mostly ferry flight for repairs, alterations, maintenance or storage.  All coded to X
+#'         }
 #'       \item \code{9}: Light Sport
+#'         \itemize{
+#'           \item \code{A}: airplane
+#'           \item \code{X}: includes: G - Glider; L - Lighter than Air; P - Power-Parachute; W- Weight-Shift-Control,
+#'         }
 #'     }
 #'   }
 #'
-#'   \item{year_mfr}{}
-#'   \item{faa_acft_make}{}
-#'   \item{faa_acft_model}{}
-#'   \item{faa_acft_type_acft}{}
+#'   \item{year_mfr}{Year manufactured.  Often missing}
+#'
+#'   \item{faa_acft_make}{aircraft make. merged from ReleasableAircraft/ACFTREF.txt}
+#'
+#'   \item{faa_acft_model}{aircraft model. merged from ReleasableAircraft/ACFTREF.txt}
+#'
+#' \describe{
+#'   \item{faa_acft_type_acft}{aircraft type. merged from ReleasableAircraft/ACFTREF.txt}
+#' }
 #'   \item{faa_acft_type_eng}{}
 #'   \item{faa_acft_ac_cat}{}
 #'   \item{faa_acft_build_cert_ind}{}
