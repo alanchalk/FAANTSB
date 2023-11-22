@@ -5,8 +5,6 @@
 \alias{dt_faa_ntsb_clean}
 \title{FAA aircraft data with NTSB event indicator flag}
 \format{
-\subsection{\code{dt_faa_ntsb_clean}}{
-
 A data frame with 2,696,313 rows and 49 columns:
 \describe{
 \item{unique_id_line}{A unique id for each line of data}
@@ -31,27 +29,28 @@ A data frame with 2,696,313 rows and 49 columns:
 }\if{html}{\out{</div>}}
 
 }
-
 \item{street2_ind}{0/1 indicator of whether or not there is second street line in address}
 \item{city}{The city name which appears on the Application for Registration, AC Form 8050-1 or the latest address reported}
 \item{state}{The state name which appears on the Application for Registration, AC Form 8050-1 or the latest address reported.}
 \item{zip_code}{The postal Zip Code which appears on the Application for Registration, AC Form 8050-1 or the latest address reported.}
 
 \item{region}{A character column indicating the region. The region codes are as follows (blanks in original data are replaced with X and may be derivable from city)
-\itemize{
-\item \code{1}: Eastern
-\item \code{2}: Southwestern
-\item \code{3}: Central
-\item \code{4}: Western-Pacific
-\item \code{5}: Alaskan
-\item \code{7}: Southern
-\item \code{8}: European
-\item \code{C}: Great Lakes
-\item \code{E}: New England
-\item \code{S}: Northwest Mountain
-}
-}
 
+\if{html}{\out{<div class="sourceCode">}}\preformatted{| Code | Description                |
+|------|----------------------------|
+| 1    | Eastern                    |
+| 2    | Southwestern               |
+| 3    | Central                    |
+| 4    | Western-Pacific            |
+| 5    | Alaskan                    |
+| 7    | Southern                   |
+| 8    | European                   |
+| C    | Great Lakes                |
+| E    | New England                |
+| S    | Northwest Mountain         |
+}\if{html}{\out{</div>}}
+
+}
 \item{county}{A code representing the county which appears on the Application for Registration}
 \item{country}{A code representing the country which appears on the Application for Registration}
 \item{nu_registered}{A derived field: The number of aircraft registered to this owner}
@@ -64,82 +63,53 @@ A data frame with 2,696,313 rows and 49 columns:
 \item{last_action_date}{}
 
 \item{airworthiness}{The airworthiness certificate class which is reported on the Application for Airworthiness, FAA Form 8130-6:
-\itemize{
-\item \code{1}: Standard
-\item \code{2}: Limited
-\item \code{3}: Restricted
-\item \code{4}: Experimental
-\item \code{5}: Provisional
-\item \code{6}: Multiple
-\item \code{7}: Primary
-\item \code{8}: Special Flight Permit
-\item \code{9}: Light Sport
-}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{| Code | Description                |
+|------|----------------------------|
+| 1    | Standard                   |
+| 2    | Limited                    |
+| 3    | Restricted                 |
+| 4    | Experimental               |
+| 5    | Provisional                |
+| 6    | Multiple                   |
+| 7    | Primary                    |
+| 8    | Special Flight Permit      |
+| 9    | Light Sport                |
+}\if{html}{\out{</div>}}
+
 }
 
 \item{operation}{For some airworthiness codes there is more detail about the operation.  There can be up to 6 operations, only one is chosen:
-\itemize{
-\item \code{1}: Standard
-\itemize{
-\item \code{N}: Normal
-\item \code{U}: Utility
-\item \code{A}: Acrobatic
-\item \code{T}: Transport
-\item \code{G}: Glider
-\item \code{B}: Balloon
-\item \code{C}: Commuter
-\item \code{X}: Other or blank
-}
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{      \\item \code{2}: Limited
-          \\itemize\{
-               \\item \code{X}: No further detail within limited.  All coded to X
-          \}
-
-      \\item \code{3}: Restricted
-          \\itemize\{
-               \\item \code{0}: Other
-               \\item \code{1}: Agriculture and Pest Control
-               \\item \code{2}: Aerial Surveying
-               \\item \code{3}: Aerial Advertising
-               \\item \code{4}: Forest
-               \\item \code{5}: Patrolling
-               \\item \code{6}: Weather Control
-               \\item \code{7}: Carriage of Cargo
-          \}
-
-      \\item \code{4}: Experimental
-          \\itemize\{
-               \\item \code{X}: Limited further detail in FAA so all coded to X
-         \}
-
-      \\item \code{5}: Provisional
-          \\itemize\{
-               \\item \code{X}: No further detail within Provisional  All coded to X
-          \}
-
-      \\item \code{6}: Multiple
-          \\itemize\{
-               \\item Same codes as code 3, restricted
-          \}
-
-      \\item \code{7}: Primary
-          \\itemize\{
-               \\item \code{X}: Very few of these (split between R&D and amateur) all coded to X
-          \}
-
-      \\item \code{8}: Special Flight Permit
-          \\itemize\{
-               \\item \code{X}: Mostly ferry flight for repairs, alterations, maintenance or storage.  All coded to X
-          \}
-
-      \\item \code{9}: Light Sport
-          \\itemize\{
-               \\item \code{A}: airplane
-               \\item \code{X}: includes: G - Glider; L - Lighter than Air; P - Power-Parachute; W- Weight-Shift-Control,
-          \}
-  \}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{| airworthiness             | code | operation description |
+|---------------------------|------|-----------------------|
+| 1 - Standard              | N    | Normal                |
+| 1 - Standard              | U    | Utility               |
+| 1 - Standard              | A    | Acrobatic             |
+| 1 - Standard              | T    | Transport             |
+| 1 - Standard              | G    | Glider                |
+| 1 - Standard              | B    | Balloon               |
+| 1 - Standard              | C    | Commuter              |
+| 1 - Standard              | X    | Other or blank        |
+| 2 - Limited               | X    | No further detail     |
+| 3 - Restricted            | 0    | Other                 |
+| 3 - Restricted            | 1    | Agriculture and Pest Control  |
+| 3 - Restricted            | 2    | Aerial Surveying      |
+| 3 - Restricted            | 3    | Aerial Advertising    |
+| 3 - Restricted            | 4    | Forest                |
+| 3 - Restricted            | 5    | Patrolling            |
+| 3 - Restricted            | 6    | Weather Control       |
+| 3 - Restricted            | 7    | Carriage of Cargo     |
+| 4 - Experimental          | X    | Limited further detail |
+| 5 - Provisional           | X    | No further detail     |
+| 6 - Multiple              |      | Same codes as code 3 - Restricted |
+| 7 - Primary               | X    | Limited further detail |
+| 8 - Special Flight Permit | X    | Mostly ferry flight for repairs, alterations, maintenance or storage |
+| 9 - Light Sport           | A    | airplane |
+| 9 - Light Sport           | X    | includes: G - Glider; L - Lighter than Air; P - Power-Parachute; W- Weight-Shift-Control |
 }\if{html}{\out{</div>}}
+
+}
 
 \item{year_mfr}{Year manufactured.  Often missing}
 
@@ -230,10 +200,109 @@ A data frame with 2,696,313 rows and 49 columns:
 }
 }
 \item{faa_eng_hp}{Horsepower for engines types 1, 2, 3, 7, 8}
-\item{faa_eng_hp_char}{}
+\item{faa_eng_hp_char}{grouping of horsepower as follows}
 
 \item{faa_eng_thrust}{Thrust for engine types 4, 5, 6}
-\item{faa_eng_thrust_char}{}
+\item{faa_eng_thrust_char}{grouping of thrust as follows}
+
+\item{kit_indyn}{Y if kit manucaturer is not blank else N}
+\item{veh_age}{age of aircraft based on year(start_date) - year(cert_issue_date)}
+\item{start_date}{start date for exposure on each line}
+\item{end_date}{end date of exposure on each line}
+\item{ex}{pmin(1, as.integer(end_date - start_date + 1) / 365.25)}
+\item{nu_cl}{number of incidents on the NTSB file between start and end date}#'   \item{year_mfr}{Year manufactured.  Often missing}
+
+\item{faa_acft_make}{aircraft make. merged from ReleasableAircraft/ACFTREF.txt}
+
+\item{faa_acft_model}{aircraft model. merged from ReleasableAircraft/ACFTREF.txt}
+
+\item{faa_acft_type_acft}{aircraft type. merged from ReleasableAircraft/ACFTREF.txt
+\itemize{
+\item \code{1}: Glider
+\item \code{2}: Balloon
+\item \code{3}: Blimp/Dirigible
+\item \code{4}: Fixed wing single engine
+\item \code{5}: Fixed wing multi engine
+\item \code{6}: Rotorcraft
+\item \code{7}: Weight-shift-control
+\item \code{8}: Powered Parachute
+\item \code{9}: Gyroplane
+\item \code{H}: Hybrid Lift
+\item \code{O}: Other
+}
+}
+
+\item{faa_acft_type_eng}{aircraft engine type merged from ReleasableAircraft/ACFTREF.txt
+\itemize{
+\item \code{0}: None
+\item \code{1}: Reciprocating
+\item \code{2}: Turbo-prop
+\item \code{3}: Turbo-shaft
+\item \code{4}: Turbo-jet
+\item \code{5}: Turbo-fan
+\item \code{6}: Ramjet
+\item \code{7}: 2 Cycle
+\item \code{8}: 4 Cycle
+\item \code{9}: Unknown
+\item \code{10}: Electric
+\item \code{11}: Rotary
+}
+}
+
+\item{faa_acft_ac_cat}{aircraft category merged from ReleasableAircraft/ACFTREF.txt
+\itemize{
+\item \code{1}: Land
+\item \code{2}: Sea
+\item \code{3}: Amphibian
+}
+}
+
+\item{faa_acft_build_cert_ind}{aircraft buidler certification code merged from ReleasableAircraft/ACFTREF.txt
+\itemize{
+\item \code{0}: Type Certificated
+\item \code{1}: Not Type Certificated
+\item \code{2}: Light Sport
+}
+}
+
+\item{faa_acft_no_eng}{number of engines merged from ReleasableAircraft/ACFTREF.txt}
+\item{faa_acft_no_seats}{number of seats merged from ReleasableAircraft/ACFTREF.txt}
+
+\item{faa_acft_ac_weight}{Aircraft maximum gross take off weight in pounds  merged from ReleasableAircraft/ACFTREF.txt
+\itemize{
+\item \code{CLASS 1}: Up to 12,499 lb
+\item \code{CLASS 2}: 12,500 - 19,999 lb
+\item \code{CLASS 3}: 20,000 and over lb
+\item \code{CLASS 4}: UAV up to 55 lb
+}
+}
+
+\item{faa_acft_speed}{Aircraft average cruising speed in miles per hour. This data element is not present on all records.}
+
+\item{faa_eng_make}{The name of the engine manufacturer. merged from ReleasableAircraft/ENGINE.txt}
+
+\item{faa_eng_model}{The name of the engine model. merged from ReleasableAircraft/ENGINE.txt}
+\item{faa_eng_type}{engine type merged from ReleasableAircraft/ENGINE.txt
+\itemize{
+\item \code{0}: None
+\item \code{1}: Reciprocating
+\item \code{2}: Turbo-prop
+\item \code{3}: Turbo-shaft
+\item \code{4}: Turbo-jet
+\item \code{5}: Turbo-fan
+\item \code{6}: Ramjet
+\item \code{7}: 2 Cycle
+\item \code{8}: 4 Cycle
+\item \code{9}: Unknown
+\item \code{10}: Electric
+\item \code{11}: Rotary
+}
+}
+\item{faa_eng_hp}{Horsepower for engines types 1, 2, 3, 7, 8}
+\item{faa_eng_hp_char}{grouping of horsepower as follows}
+
+\item{faa_eng_thrust}{Thrust for engine types 4, 5, 6}
+\item{faa_eng_thrust_char}{grouping of thrust as follows}
 
 \item{kit_indyn}{Y if kit manucaturer is not blank else N}
 \item{veh_age}{age of aircraft based on year(start_date) - year(cert_issue_date)}
@@ -241,7 +310,7 @@ A data frame with 2,696,313 rows and 49 columns:
 \item{end_date}{end date of exposure on each line}
 \item{ex}{pmin(1, as.integer(end_date - start_date + 1) / 365.25)}
 \item{nu_cl}{number of incidents on the NTSB file between start and end date}
-}
+
 }
 }
 \source{
@@ -258,8 +327,6 @@ dt_faa_ntsb_clean
 The FAA maintains a list of registered aircraft with various details
 including date the registration number (n number), the date aircraft was
 certified and the expiration date.  A zip file is available at the link below.
-}
-\details{
 The NTSB keeps detailed records of every incidents in a access database.
 The full Access database (avall.zip) and the database structure (codman.pdf)
 are available at the links below.
