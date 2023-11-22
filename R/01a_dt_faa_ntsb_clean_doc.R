@@ -7,6 +7,8 @@
 #' The full Access database (avall.zip) and the database structure (codman.pdf)
 #' are available at the links below.
 #'
+#' @usage data(dt_faa_ntsb_clean)
+#'
 #' @format A data frame with 2,696,313 rows and 49 columns:
 #' \describe{
 #'   \item{unique_id_line}{A unique id for each line of data}
