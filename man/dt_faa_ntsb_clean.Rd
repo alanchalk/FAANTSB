@@ -321,7 +321,7 @@ A data frame with 2,696,313 rows and 49 columns:
 \url{https://data.ntsb.gov/avdata/FileDirectory/DownloadFile?fileID=C\%3A\%5Cavdata\%5Ccodman.pdf}
 }
 \usage{
-dt_faa_ntsb_clean
+data(dt_faa_ntsb_clean)
 }
 \description{
 The FAA maintains a list of registered aircraft with various details
