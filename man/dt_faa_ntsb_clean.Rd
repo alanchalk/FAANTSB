@@ -79,44 +79,164 @@ A data frame with 2,696,313 rows and 49 columns:
 }
 
 \describe{
-\item{operation}{Based on the approved operations reported on the Application for Airworthiness, FAA Form 8130-6.  There can be up to 6, only one is chosen:
+\item{operation}{For some airworthiness codes there is more detail about the operation.  There can be up to 6 operations, only one is chosen:
 \itemize{
 \item \code{1}: Standard
+\itemize{
+\item \code{N}: Normal
+\item \code{U}: Utility
+\item \code{A}: Acrobatic
+\item \code{T}: Transport
+\item \code{G}: Glider
+\item \code{B}: Balloon
+\item \code{C}: Commuter
+\item \code{X}: Other or blank
+}
 \item \code{2}: Limited
+\itemize{
+\item \code{X}: No further detail within limited.  All coded to X
+}
 \item \code{3}: Restricted
+\itemize{
+\item \code{0}: Other
+\item \code{1}: Agriculture and Pest Control
+\item \code{2}: Aerial Surveying
+\item \code{3}: Aerial Advertising
+\item \code{4}: Forest
+\item \code{5}: Patrolling
+\item \code{6}: Weather Control
+\item \code{7}: Carriage of Cargo
+}
 \item \code{4}: Experimental
-\item \code{5}: Provisional
+\itemize{
+\item \code{X}: Limited further detail in FAA so all coded to X
+}
 \item \code{6}: Multiple
+\itemize{
+\item Same codes as code 3, restricted
+}
 \item \code{7}: Primary
+\itemize{
+\item \code{X}: Very few of these (split between R&D and amateur) all coded to X
+}
 \item \code{8}: Special Flight Permit
+\itemize{
+\item \code{X}: Mostly ferry flight for repairs, alterations, maintenance or storage.  All coded to X
+}
 \item \code{9}: Light Sport
+\itemize{
+\item \code{A}: airplane
+\item \code{X}: includes: G - Glider; L - Lighter than Air; P - Power-Parachute; W- Weight-Shift-Control,
+}
 }
 }
 
-\item{year_mfr}{}
-\item{faa_acft_make}{}
-\item{faa_acft_model}{}
-\item{faa_acft_type_acft}{}
-\item{faa_acft_type_eng}{}
-\item{faa_acft_ac_cat}{}
-\item{faa_acft_build_cert_ind}{}
-\item{faa_acft_no_eng}{}
-\item{faa_acft_no_seats}{}
-\item{faa_acft_ac_weight}{}
-\item{faa_acft_speed}{}
-\item{faa_eng_make}{}
-\item{faa_eng_model}{}
-\item{faa_eng_type}{}
-\item{faa_eng_hp}{}
+\item{year_mfr}{Year manufactured.  Often missing}
+
+\item{faa_acft_make}{aircraft make. merged from ReleasableAircraft/ACFTREF.txt}
+
+\item{faa_acft_model}{aircraft model. merged from ReleasableAircraft/ACFTREF.txt}
+
+\describe{
+\item{faa_acft_type_acft}{aircraft type. merged from ReleasableAircraft/ACFTREF.txt}
+\itemize{
+\item \code{1}: Glider
+\item \code{2}: Balloon
+\item \code{3}: Blimp/Dirigible
+\item \code{4}: Fixed wing single engine
+\item \code{5}: Fixed wing multi engine
+\item \code{6}: Rotorcraft
+\item \code{7}: Weight-shift-control
+\item \code{8}: Powered Parachute
+\item \code{9}: Gyroplane
+\item \code{H}: Hybrid Lift
+\item \code{O}: Other
+}
+}
+
+\describe{
+\item{faa_acft_type_eng}{aircraft engine type merged from ReleasableAircraft/ACFTREF.txt}
+\itemize{
+\item \code{0}: None
+\item \code{1}: Reciprocating
+\item \code{2}: Turbo-prop
+\item \code{3}: Turbo-shaft
+\item \code{4}: Turbo-jet
+\item \code{5}: Turbo-fan
+\item \code{6}: Ramjet
+\item \code{7}: 2 Cycle
+\item \code{8}: 4 Cycle
+\item \code{9}: Unknown
+\item \code{10}: Electric
+\item \code{11}: Rotary
+}
+}
+
+\describe{
+\item{faa_acft_ac_cat}{aircraft category merged from ReleasableAircraft/ACFTREF.txt}
+\itemize{
+\item \code{1}: Land
+\item \code{2}: Sea
+\item \code{3}: Amphibian
+}
+}
+
+\describe{
+\item{faa_acft_build_cert_ind}{aircraft buidler certification code merged from ReleasableAircraft/ACFTREF.txt}
+\itemize{
+\item \code{0}: Type Certificated
+\item \code{1}: Not Type Certificated
+\item \code{2}: Light Sport
+}
+}
+
+\item{faa_acft_no_eng}{number of engines merged from ReleasableAircraft/ACFTREF.txt}
+\item{faa_acft_no_seats}{number of seats merged from ReleasableAircraft/ACFTREF.txt}
+
+\describe{
+\item{faa_acft_ac_weight}{Aircraft maximum gross take off weight in pounds  merged from ReleasableAircraft/ACFTREF.txt}
+\itemize{
+\item \code{CLASS 1}: Up to 12,499 lb
+\item \code{CLASS 2}: 12,500 - 19,999 lb
+\item \code{CLASS 3}: 20,000 and over lb
+\item \code{CLASS 4}: UAV up to 55 lb
+}
+}
+
+\item{faa_acft_speed}{Aircraft average cruising speed in miles per hour. This data element is not present on all records.}
+
+\item{faa_eng_make}{The name of the engine manufacturer. merged from ReleasableAircraft/ENGINE.txt}
+
+\item{faa_eng_model}{The name of the engine model. merged from ReleasableAircraft/ENGINE.txt}
+\describe{
+\item{faa_eng_type}{engine type merged from ReleasableAircraft/ENGINE.txt}
+\itemize{
+\item \code{0}: None
+\item \code{1}: Reciprocating
+\item \code{2}: Turbo-prop
+\item \code{3}: Turbo-shaft
+\item \code{4}: Turbo-jet
+\item \code{5}: Turbo-fan
+\item \code{6}: Ramjet
+\item \code{7}: 2 Cycle
+\item \code{8}: 4 Cycle
+\item \code{9}: Unknown
+\item \code{10}: Electric
+\item \code{11}: Rotary
+}
+}
+\item{faa_eng_hp}{Horsepower for engines types 1, 2, 3, 7, 8}
 \item{faa_eng_hp_char}{}
-\item{faa_eng_thrust}{}
+
+\item{faa_eng_thrust}{Thrust for engine types 4, 5, 6}
 \item{faa_eng_thrust_char}{}
-\item{kit_indyn}{}
-\item{veh_age}{}
-\item{start_date}{}
-\item{end_date}{}
-\item{ex}{}
-\item{nu_cl}{}
+
+\item{kit_indyn}{Y if kit manucaturer is not blank else N}
+\item{veh_age}{age of aircraft based on year(start_date) - year(cert_issue_date)}
+\item{start_date}{start date for exposure on each line}
+\item{end_date}{end date of exposure on each line}
+\item{ex}{pmin(1, as.integer(end_date - start_date + 1) / 365.25)}
+\item{nu_cl}{number of incidents on the NTSB file between start and end date}
 }
 }
 \source{
