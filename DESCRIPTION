@@ -1,0 +1,14 @@
+Package: FAANTSB
+Title: A dataset of FAA registered aircraft, with an NTSB incident flag
+Version: 0.0.0.9000
+Authors@R:
+    person("Alan", "Chalk", , "alan.chalk@gmail.com", role = c("aut", "cre"))
+Description: A dataset of aircraft, with one line per aircraft per year.  The
+    flag nu_cl is added to each record which has an NTSB incident associated with it.
+License: `use_mit_license()`
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Depends:
+    R (>= 2.10)
+LazyData: true
