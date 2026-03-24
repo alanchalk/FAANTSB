@@ -40,7 +40,7 @@
 #'   \item{city}{Registrant city from Application for Registration (too many levels for direct modelling)}
 #'   \item{state}{Registrant US state abbreviation}
 #'   \item{zip_code}{Registrant zip code from Application for Registration}
-#'   \item{region}{FAA administrative region. Blanks in original data are replaced with X:
+#'   \item{region}{FAA administrative region (X = unknown / blank in source):
 #'
 #'     | Code | Description                |
 #'     |------|----------------------------|
@@ -175,7 +175,7 @@
 #'   \item{faa_acft_speed}{Average cruising speed in mph from FAA ACFTREF.txt. Capped at 400. Zero where not recorded}
 #'   \item{faa_eng_make}{Engine manufacturer name from FAA ENGINE.txt. Too many levels for direct modelling}
 #'   \item{faa_eng_model}{Engine model name from FAA ENGINE.txt. Too many levels for direct modelling}
-#'   \item{faa_eng_type}{Engine type from FAA ENGINE.txt. Null replaced with X:
+#'   \item{faa_eng_type}{Engine type from FAA ENGINE.txt (X = missing / not matched):
 #'     \itemize{
 #'       \item \code{0}: None
 #'       \item \code{1}: Reciprocating
