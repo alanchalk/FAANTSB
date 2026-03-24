@@ -7,14 +7,19 @@
 \format{
 A data frame with 2,696,313 rows and 49 columns:
 \describe{
-\item{unique_id_line}{A unique id for each line of data}
-\item{unique_id_ac}{A unique id for each aircraft.  Not related to the unique_id on the FAA data}
-\item{n_number}{n number from the FAA data.  The prefix N has been added}
-\item{serial_number}{serial number from the FAA data}
-\item{source}{Source of the data; either the FAA master file or the FAA dergistered file}
-\item{mfr_mdl_code}{Aircraft manufacture and model code from the FAA data}
-\item{eng_mfr_mdl}{Engine manufacture and model code from the FAA data}
-\item{type_registrant}{The type of the registered owner. The codes and their corresponding descriptions are as follows:
+\item{unique_id_line}{Unique identifier for each row (one per aircraft-year)}
+\item{unique_id_ac}{Unique identifier for each aircraft. Not related to the FAA unique_id}
+\item{n_number}{FAA N-number (registration number), prefixed with N}
+\item{serial_number}{Aircraft serial number assigned by the manufacturer}
+\item{source}{FAA data source: master file (active registrations) or dereg file (deregistered aircraft)
+\itemize{
+\item \code{master}: FAA master (active) file
+\item \code{dereg}: FAA deregistered file
+}
+}
+\item{mfr_mdl_code}{Aircraft manufacturer, model and series code from FAA data (7-character code)}
+\item{eng_mfr_mdl}{Engine manufacturer and model code from FAA data. Null for ~8.5\\% of rows where engine reference not found}
+\item{type_registrant}{Type of registered owner. The codes and their descriptions are:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{| Code | Description                |
 |------|----------------------------|
@@ -29,12 +34,11 @@ A data frame with 2,696,313 rows and 49 columns:
 }\if{html}{\out{</div>}}
 
 }
-\item{street2_ind}{0/1 indicator of whether or not there is second street line in address}
-\item{city}{The city name which appears on the Application for Registration, AC Form 8050-1 or the latest address reported}
-\item{state}{The state name which appears on the Application for Registration, AC Form 8050-1 or the latest address reported.}
-\item{zip_code}{The postal Zip Code which appears on the Application for Registration, AC Form 8050-1 or the latest address reported.}
-
-\item{region}{A character column indicating the region. The region codes are as follows (blanks in original data are replaced with X and may be derivable from city)
+\item{street2_ind}{0/1 indicator: whether a second street line is present in the registrant address}
+\item{city}{Registrant city from Application for Registration (too many levels for direct modelling)}
+\item{state}{Registrant US state abbreviation}
+\item{zip_code}{Registrant zip code from Application for Registration}
+\item{region}{FAA administrative region. Blanks in original data are replaced with X:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{| Code | Description                |
 |------|----------------------------|
@@ -48,21 +52,26 @@ A data frame with 2,696,313 rows and 49 columns:
 | C    | Great Lakes                |
 | E    | New England                |
 | S    | Northwest Mountain         |
+| X    | Unknown / blank in source  |
 }\if{html}{\out{</div>}}
 
 }
-\item{county}{A code representing the county which appears on the Application for Registration}
-\item{country}{A code representing the country which appears on the Application for Registration}
-\item{nu_registered}{A derived field: The number of aircraft registered to this owner}
-\item{co_owners_num}{A derived field: The number of co-owners}
-\item{co_ownership}{A derived field: Whether or not the aircraft is co-onwed}
-\item{nu_n_number}{A derived field: The number of time an n_number appears in a data source}
-\item{cert_issue_date}{}
-\item{air_worth_date}{}
-\item{expiration_date}{}
-\item{last_action_date}{}
-
-\item{airworthiness}{The airworthiness certificate class which is reported on the Application for Airworthiness, FAA Form 8130-6:
+\item{county}{County code from Application for Registration. Null for ~0.6\\% of rows}
+\item{country}{Country code from Application for Registration}
+\item{nu_registered}{Number of aircraft registered to the same owner name. Derived field}
+\item{co_owners_num}{Number of co-owners listed on the registration. Derived from other_names_1 to other_names_5 fields}
+\item{co_ownership}{Y/N indicator: whether aircraft has one or more co-owners (co_owners_num >= 1)
+\itemize{
+\item \code{Y}: Co-owned
+\item \code{N}: Not co-owned
+}
+}
+\item{nu_n_number}{Number of times this n_number appears in the data. Potential leakage — correlated with registration history, not with true risk}
+\item{cert_issue_date}{Date the airworthiness certificate was issued}
+\item{air_worth_date}{Date the aircraft was determined airworthy}
+\item{expiration_date}{Expiration date of the registration}
+\item{last_action_date}{Date of last action on the registration record}
+\item{airworthiness}{Airworthiness certificate class from FAA Form 8130-6:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{| Code | Description                |
 |------|----------------------------|
@@ -78,8 +87,7 @@ A data frame with 2,696,313 rows and 49 columns:
 }\if{html}{\out{</div>}}
 
 }
-
-\item{operation}{For some airworthiness codes there is more detail about the operation.  There can be up to 6 operations, only one is chosen:
+\item{operation}{Operation type, derived from certification field. Meaning varies by airworthiness class:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{| airworthiness             | code | operation description |
 |---------------------------|------|-----------------------|
@@ -110,14 +118,10 @@ A data frame with 2,696,313 rows and 49 columns:
 }\if{html}{\out{</div>}}
 
 }
-
-\item{year_mfr}{Year manufactured.  Often missing}
-
-\item{faa_acft_make}{aircraft make. merged from ReleasableAircraft/ACFTREF.txt}
-
-\item{faa_acft_model}{aircraft model. merged from ReleasableAircraft/ACFTREF.txt}
-
-\item{faa_acft_type_acft}{aircraft type. merged from ReleasableAircraft/ACFTREF.txt
+\item{year_mfr}{Year manufactured. Often missing}
+\item{faa_acft_make}{Aircraft manufacturer name from FAA ACFTREF.txt. ~49k unique values — too many levels for direct modelling}
+\item{faa_acft_model}{Aircraft model name from FAA ACFTREF.txt. ~25k unique values — too many levels for direct modelling}
+\item{faa_acft_type_acft}{Aircraft type from FAA ACFTREF.txt. Dataset is filtered to types 4, 5, 6 only:
 \itemize{
 \item \code{1}: Glider
 \item \code{2}: Balloon
@@ -132,8 +136,7 @@ A data frame with 2,696,313 rows and 49 columns:
 \item \code{O}: Other
 }
 }
-
-\item{faa_acft_type_eng}{aircraft engine type merged from ReleasableAircraft/ACFTREF.txt
+\item{faa_acft_type_eng}{Aircraft engine type from FAA ACFTREF.txt:
 \itemize{
 \item \code{0}: None
 \item \code{1}: Reciprocating
@@ -149,27 +152,23 @@ A data frame with 2,696,313 rows and 49 columns:
 \item \code{11}: Rotary
 }
 }
-
-\item{faa_acft_ac_cat}{aircraft category merged from ReleasableAircraft/ACFTREF.txt
+\item{faa_acft_ac_cat}{Aircraft landing category from FAA ACFTREF.txt:
 \itemize{
 \item \code{1}: Land
 \item \code{2}: Sea
 \item \code{3}: Amphibian
 }
 }
-
-\item{faa_acft_build_cert_ind}{aircraft buidler certification code merged from ReleasableAircraft/ACFTREF.txt
+\item{faa_acft_build_cert_ind}{Builder certification code from FAA ACFTREF.txt:
 \itemize{
 \item \code{0}: Type Certificated
 \item \code{1}: Not Type Certificated
 \item \code{2}: Light Sport
 }
 }
-
-\item{faa_acft_no_eng}{number of engines merged from ReleasableAircraft/ACFTREF.txt}
-\item{faa_acft_no_seats}{number of seats merged from ReleasableAircraft/ACFTREF.txt}
-
-\item{faa_acft_ac_weight}{Aircraft maximum gross take off weight in pounds  merged from ReleasableAircraft/ACFTREF.txt
+\item{faa_acft_no_eng}{Number of engines from FAA ACFTREF.txt. Capped at 4; records with >4 engines removed as likely errors}
+\item{faa_acft_no_seats}{Number of seats from FAA ACFTREF.txt. Capped at 400}
+\item{faa_acft_ac_weight}{Maximum gross take-off weight class from FAA ACFTREF.txt. Dataset excludes CLASS 4 (UAV/drone):
 \itemize{
 \item \code{CLASS 1}: Up to 12,499 lb
 \item \code{CLASS 2}: 12,500 - 19,999 lb
@@ -177,13 +176,10 @@ A data frame with 2,696,313 rows and 49 columns:
 \item \code{CLASS 4}: UAV up to 55 lb
 }
 }
-
-\item{faa_acft_speed}{Aircraft average cruising speed in miles per hour. This data element is not present on all records.}
-
-\item{faa_eng_make}{The name of the engine manufacturer. merged from ReleasableAircraft/ENGINE.txt}
-
-\item{faa_eng_model}{The name of the engine model. merged from ReleasableAircraft/ENGINE.txt}
-\item{faa_eng_type}{engine type merged from ReleasableAircraft/ENGINE.txt
+\item{faa_acft_speed}{Average cruising speed in mph from FAA ACFTREF.txt. Capped at 400. Zero where not recorded}
+\item{faa_eng_make}{Engine manufacturer name from FAA ENGINE.txt. Too many levels for direct modelling}
+\item{faa_eng_model}{Engine model name from FAA ENGINE.txt. Too many levels for direct modelling}
+\item{faa_eng_type}{Engine type from FAA ENGINE.txt. Null replaced with X:
 \itemize{
 \item \code{0}: None
 \item \code{1}: Reciprocating
@@ -197,120 +193,43 @@ A data frame with 2,696,313 rows and 49 columns:
 \item \code{9}: Unknown
 \item \code{10}: Electric
 \item \code{11}: Rotary
+\item \code{X}: Missing / not matched
 }
 }
-\item{faa_eng_hp}{Horsepower for engines types 1, 2, 3, 7, 8}
-\item{faa_eng_hp_char}{grouping of horsepower as follows}
-
-\item{faa_eng_thrust}{Thrust for engine types 4, 5, 6}
-\item{faa_eng_thrust_char}{grouping of thrust as follows}
-
-\item{kit_indyn}{Y if kit manucaturer is not blank else N}
-\item{veh_age}{age of aircraft based on year(start_date) - year(cert_issue_date)}
-\item{start_date}{start date for exposure on each line}
-\item{end_date}{end date of exposure on each line}
-\item{ex}{pmin(1, as.integer(end_date - start_date + 1) / 365.25)}
-\item{nu_cl}{number of incidents on the NTSB file between start and end date}#'   \item{year_mfr}{Year manufactured.  Often missing}
-
-\item{faa_acft_make}{aircraft make. merged from ReleasableAircraft/ACFTREF.txt}
-
-\item{faa_acft_model}{aircraft model. merged from ReleasableAircraft/ACFTREF.txt}
-
-\item{faa_acft_type_acft}{aircraft type. merged from ReleasableAircraft/ACFTREF.txt
+\item{faa_eng_hp}{Engine horsepower from FAA ENGINE.txt. Bucketed: 1-150 mapped to 100, then rounded to nearest 100 (capped at 1500). Null for ~8.5\\% where engine not matched}
+\item{faa_eng_hp_char}{Engine horsepower category (derived from faa_eng_hp). Preferred over faa_eng_hp for modelling:
 \itemize{
-\item \code{1}: Glider
-\item \code{2}: Balloon
-\item \code{3}: Blimp/Dirigible
-\item \code{4}: Fixed wing single engine
-\item \code{5}: Fixed wing multi engine
-\item \code{6}: Rotorcraft
-\item \code{7}: Weight-shift-control
-\item \code{8}: Powered Parachute
-\item \code{9}: Gyroplane
-\item \code{H}: Hybrid Lift
-\item \code{O}: Other
+\item \code{X}: Missing (engine not matched)
+\item \code{Y}: 0 hp
+\item \code{A}: 1-150 hp
+\item \code{B}: 200 hp
+\item \code{C}: 300 hp
+\item \code{D}: 400-800 hp
+\item \code{E}: 900-1,400 hp
+\item \code{F}: 1,500+ hp
 }
 }
-
-\item{faa_acft_type_eng}{aircraft engine type merged from ReleasableAircraft/ACFTREF.txt
+\item{faa_eng_thrust}{Engine thrust in lbf from FAA ENGINE.txt. Bucketed and capped at 50,000. Null for ~8.5\\% where engine not matched}
+\item{faa_eng_thrust_char}{Engine thrust category (derived from faa_eng_thrust). Preferred over faa_eng_thrust for modelling:
 \itemize{
-\item \code{0}: None
-\item \code{1}: Reciprocating
-\item \code{2}: Turbo-prop
-\item \code{3}: Turbo-shaft
-\item \code{4}: Turbo-jet
-\item \code{5}: Turbo-fan
-\item \code{6}: Ramjet
-\item \code{7}: 2 Cycle
-\item \code{8}: 4 Cycle
-\item \code{9}: Unknown
-\item \code{10}: Electric
-\item \code{11}: Rotary
+\item \code{X}: Missing (engine not matched)
+\item \code{Y}: 0 lbf
+\item \code{A}: ~10,000 lbf
+\item \code{B}: 20,000-40,000 lbf
+\item \code{C}: 50,000+ lbf
 }
 }
-
-\item{faa_acft_ac_cat}{aircraft category merged from ReleasableAircraft/ACFTREF.txt
+\item{kit_indyn}{Y/N indicator: whether aircraft is kit-built (kit manufacturer is not blank):
 \itemize{
-\item \code{1}: Land
-\item \code{2}: Sea
-\item \code{3}: Amphibian
+\item \code{Y}: Kit-built aircraft
+\item \code{N}: Not kit-built
 }
 }
-
-\item{faa_acft_build_cert_ind}{aircraft buidler certification code merged from ReleasableAircraft/ACFTREF.txt
-\itemize{
-\item \code{0}: Type Certificated
-\item \code{1}: Not Type Certificated
-\item \code{2}: Light Sport
-}
-}
-
-\item{faa_acft_no_eng}{number of engines merged from ReleasableAircraft/ACFTREF.txt}
-\item{faa_acft_no_seats}{number of seats merged from ReleasableAircraft/ACFTREF.txt}
-
-\item{faa_acft_ac_weight}{Aircraft maximum gross take off weight in pounds  merged from ReleasableAircraft/ACFTREF.txt
-\itemize{
-\item \code{CLASS 1}: Up to 12,499 lb
-\item \code{CLASS 2}: 12,500 - 19,999 lb
-\item \code{CLASS 3}: 20,000 and over lb
-\item \code{CLASS 4}: UAV up to 55 lb
-}
-}
-
-\item{faa_acft_speed}{Aircraft average cruising speed in miles per hour. This data element is not present on all records.}
-
-\item{faa_eng_make}{The name of the engine manufacturer. merged from ReleasableAircraft/ENGINE.txt}
-
-\item{faa_eng_model}{The name of the engine model. merged from ReleasableAircraft/ENGINE.txt}
-\item{faa_eng_type}{engine type merged from ReleasableAircraft/ENGINE.txt
-\itemize{
-\item \code{0}: None
-\item \code{1}: Reciprocating
-\item \code{2}: Turbo-prop
-\item \code{3}: Turbo-shaft
-\item \code{4}: Turbo-jet
-\item \code{5}: Turbo-fan
-\item \code{6}: Ramjet
-\item \code{7}: 2 Cycle
-\item \code{8}: 4 Cycle
-\item \code{9}: Unknown
-\item \code{10}: Electric
-\item \code{11}: Rotary
-}
-}
-\item{faa_eng_hp}{Horsepower for engines types 1, 2, 3, 7, 8}
-\item{faa_eng_hp_char}{grouping of horsepower as follows}
-
-\item{faa_eng_thrust}{Thrust for engine types 4, 5, 6}
-\item{faa_eng_thrust_char}{grouping of thrust as follows}
-
-\item{kit_indyn}{Y if kit manucaturer is not blank else N}
-\item{veh_age}{age of aircraft based on year(start_date) - year(cert_issue_date)}
-\item{start_date}{start date for exposure on each line}
-\item{end_date}{end date of exposure on each line}
-\item{ex}{pmin(1, as.integer(end_date - start_date + 1) / 365.25)}
-\item{nu_cl}{number of incidents on the NTSB file between start and end date}
-
+\item{veh_age}{Aircraft age in years: year(start_date) - year(cert_issue_date). Capped at 50}
+\item{start_date}{Start of annual exposure window for this row (YYYY-MM-DD)}
+\item{end_date}{End of annual exposure window for this row (YYYY-MM-DD)}
+\item{ex}{Exposure in years: pmin(1, (end_date - start_date + 1) / 365.25). Model offset: log(ex)}
+\item{nu_cl}{Number of NTSB incidents matched to this aircraft-year. Primary model target}
 }
 }
 \source{
@@ -325,9 +244,9 @@ data(dt_faa_ntsb_clean)
 }
 \description{
 The FAA maintains a list of registered aircraft with various details
-including date the registration number (n number), the date aircraft was
-certified and the expiration date.  A zip file is available at the link below.
-The NTSB keeps detailed records of every incidents in a access database.
+including the registration number (N-number), the date aircraft was
+certified and the expiration date. A zip file is available at the link below.
+The NTSB keeps detailed records of every incident in an Access database.
 The full Access database (avall.zip) and the database structure (codman.pdf)
 are available at the links below.
 }
