@@ -6,7 +6,11 @@
 .quarto
 /data-raw/*
 !/data-raw/*.R
+!/data-raw/*.py
 inst/doc
 /doc/
 /Meta/
 .Rproj
+
+# catboost training logs
+catboost_info/
