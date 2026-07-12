@@ -54,11 +54,17 @@ CATEGORICAL = [
 ]
 FEATURES = NUMERIC + CATEGORICAL
 
-# Deliberately EXCLUDED: `dereg` (and `source`) -- the deregistered-aircraft
-# data-source leak. It is a student trap in the published dataset (it predicts
-# well but is not a legitimate rating variable). The champion benchmark must not
-# use it, so it is never added to FEATURES.
+# Deliberately EXCLUDED: `dereg` (and `source`) -- the direct deregistered-aircraft
+# data-source leak; a student trap in the published dataset (predicts well but is
+# not a legitimate rating variable), so it is never added to FEATURES.
 assert "dereg" not in FEATURES and "source" not in FEATURES
+#
+# NOTE: `region` is a BACKDOOR of the same leak and IS kept in FEATURES.
+# region == "X" (blank in the source file) is exactly the deregistered aircraft
+# (154,721 rows, all source == dereg), so the champion still sees the leak through
+# region. This is deliberate -- region is retained for consistency with the CAS
+# Monograph 16 dataset. It is why v1 scores ~0.18 pseudo-R^2 (leak-inflated) while
+# v2 (region resolved from state, no "X") scores ~0.06.
 
 # Exact hyperparameters from the stored 04a_ctb_*.cbm (flat_params + tree/boost
 # options), so a fresh CatBoost reproduces the monograph model regardless of the
