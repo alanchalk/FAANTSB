@@ -1,0 +1,31 @@
+{
+  "model_type": "CatBoost GBM",
+  "metric": "pseudo-R2, Poisson deviance, exposure-weighted",
+  "pseudo_r2_train": 0.08545728418267773,
+  "pseudo_r2_held_out": 0.05978243006751682,
+  "loss": "Poisson",
+  "target": "freq_cl",
+  "features": [
+    "nu_registered",
+    "faa_acft_no_seats",
+    "faa_acft_speed",
+    "acft_age",
+    "type_registrant",
+    "street2_ind",
+    "co_ownership",
+    "airworthiness",
+    "operation",
+    "kit_indyn",
+    "faa_acft_type_acft",
+    "faa_acft_type_eng",
+    "faa_acft_ac_cat",
+    "faa_acft_build_cert_ind",
+    "faa_acft_no_eng",
+    "faa_acft_ac_weight",
+    "faa_eng_hp_char",
+    "faa_eng_thrust_char"
+  ],
+  "n_features": 18,
+  "n_rows": 638777,
+  "created_at": "2026-09-11T06:45:50.283271+00:00"
+}
