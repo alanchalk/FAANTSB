@@ -44,11 +44,13 @@ The published Parquet file contains one row per in-scope NTSB aircraft occurrenc
 It contains:
 
 - the simulated hull-loss target;
+- simulated hull value at the accident-date price level;
+- hull loss as a proportion of that value, as an alternative target;
 - the matched frequency-v2 row identifier and inherited fold;
 - only pre-event FAA rating factors;
 - the same names, types, category cleaning and levels as the corresponding frequency-v2 columns.
 
-It must not publish aircraft value, damage ratio or NTSB damage class as modelling columns. Those fields either reproduce the target or use post-event knowledge. Deregistration-derived fields must also be excluded because destruction can itself cause deregistration.
+It must not publish NTSB damage class as a modelling column. Deregistration-derived fields must also be excluded because destruction can itself cause deregistration. Hull value is known before the loss and is published with the corresponding loss ratio so students can compare monetary severity and loss-ratio models. The amount and ratio are alternative targets and must not be used to predict each other.
 
 ### Audit dataset
 
@@ -160,7 +162,7 @@ The catalogue documentation must identify the target as simulated and explain it
 - Every row maps to a frequency-v2 sample row and inherits its fold unchanged.
 - Every row publishes its NTSB accident date. Total losses use the aircraft-and-equipment PPI and partial repairs use the aircraft-repair PPI to express costs at the accident-date price level.
 - Shared feature names, data types, category levels and missing-value treatment match frequency v2 exactly.
-- Aircraft value, damage ratio, damage class and deregistration-derived information are absent from modelling features.
+- Damage class and deregistration-derived information are absent from modelling features. Hull loss amount and ratio are declared as alternative targets.
 - Synthetic values decline sensibly with age within comparable aircraft classes.
 - Loss amounts overlap substantially within and between aircraft classes rather than being recoverable from the published predictors.
 - The fixed reference Gamma model's held-out PR-squared is within the chosen 20–32% range.

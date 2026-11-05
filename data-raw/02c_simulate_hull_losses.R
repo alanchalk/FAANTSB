@@ -70,6 +70,10 @@ index_at <- function(dates, index_table) {
 
 replacement_at_accident <- index_at(claims$ev_date, replacement_index)
 replacement_factor <- replacement_at_accident / tail(replacement_index$index, 1)
+claims[, hull_value := round(
+  pmax(500, synthetic_aircraft_value * replacement_factor),
+  -2
+)]
 
 # The repair series begins in April 2009. Backcast the earlier months using
 # the aircraft-and-equipment index, anchored to the first repair observation.
@@ -86,10 +90,18 @@ claims[, inflation_factor := fifelse(
   is_total_loss, replacement_factor, repair_factor
 )]
 claims[, hull_loss := round(hull_loss_latest_price_level * inflation_factor, -1)]
-claims[, damage_ratio := hull_loss / synthetic_aircraft_value]
+claims[, hull_loss := pmin(hull_loss, hull_value)]
+claims[, hull_loss_ratio := hull_loss / hull_value]
+claims[, damage_ratio := hull_loss_ratio]
 
 if (anyNA(claims$hull_loss)) stop("One or more claims have no simulated severity")
 if (any(claims$hull_loss <= 0)) stop("Every simulated severity must be positive")
+if (anyNA(claims$hull_value) || any(claims$hull_value <= 0)) {
+  stop("Every claim must have one positive accident-date hull value")
+}
+if (any(claims$hull_loss_ratio <= 0 | claims$hull_loss_ratio > 1)) {
+  stop("Hull loss ratios must be in (0, 1]")
+}
 
 summary_by_damage <- claims[, .(
   claims = .N,

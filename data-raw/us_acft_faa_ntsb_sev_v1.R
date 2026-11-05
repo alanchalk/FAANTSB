@@ -35,6 +35,8 @@ severity <- merge(
     unique_id_line,
     accident_date = ev_date,
     acft_age_at_accident = value_age,
+    hull_value,
+    hull_loss_ratio,
     hull_loss
   )],
   frequency[, c("unique_id_line", "fold", features), with = FALSE],
@@ -47,7 +49,7 @@ severity[, acft_age := as.integer(pmin(50, pmax(0, acft_age_at_accident)))]
 severity[, acft_age_at_accident := NULL]
 setcolorder(severity, c(
   "claim_id", "unique_id_line", "accident_date", "accident_year",
-  features, "fold", "hull_loss"
+  features, "fold", "hull_value", "hull_loss", "hull_loss_ratio"
 ))
 setorder(severity, claim_id)
 
@@ -56,6 +58,12 @@ if (anyNA(severity$accident_date)) stop("Every published claim must have an acci
 if (anyNA(severity$accident_year)) stop("Every published claim must have an accident year")
 if (anyNA(severity$hull_loss) || any(severity$hull_loss <= 0)) {
   stop("Every published claim must have one positive hull-loss severity")
+}
+if (anyNA(severity$hull_value) || any(severity$hull_value <= 0)) {
+  stop("Every published claim must have one positive accident-date hull value")
+}
+if (any(severity$hull_loss_ratio <= 0 | severity$hull_loss_ratio > 1)) {
+  stop("Published hull loss ratios must be in (0, 1]")
 }
 if (anyNA(severity$fold)) stop("Every published claim must inherit a frequency-v2 fold")
 
