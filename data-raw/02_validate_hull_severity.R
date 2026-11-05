@@ -21,6 +21,8 @@ stopifnot(
   !anyDuplicated(severity$claim_id),
   !anyNA(severity$accident_date),
   inherits(severity$accident_date, "Date"),
+  !anyNA(severity$accident_year),
+  all(severity$accident_year == as.integer(format(severity$accident_date, "%Y"))),
   !anyNA(severity$hull_loss),
   all(severity$hull_loss > 0),
   !any(c("damage", "damage_ratio", "synthetic_aircraft_value") %chin% names(severity))
@@ -59,7 +61,7 @@ gamma_deviance <- function(actual, predicted) {
 # This fixed reference model uses only information available before an accident.
 # It guards against making the synthetic target either trivial or unlearnable.
 reference_model <- glm(
-  hull_loss ~ acft_age + log1p(faa_acft_no_seats) +
+  hull_loss ~ accident_year + acft_age + log1p(faa_acft_no_seats) +
     log1p(faa_acft_speed) + faa_acft_ac_weight + faa_acft_type_acft +
     faa_acft_type_eng + faa_acft_no_eng,
   data = severity[fold != 99],

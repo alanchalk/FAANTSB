@@ -11,6 +11,7 @@ Important columns are:
 \item{claim_id}{Stable NTSB event-aircraft identifier.}
 \item{unique_id_line}{Identifier of the matched frequency-v2 aircraft-year row.}
 \item{accident_date}{Date of the NTSB accident or incident.}
+\item{accident_year}{Calendar year derived from \code{accident_date} for use as a numeric modelling feature.}
 \item{fold}{Fold inherited from the matched frequency-v2 row.}
 \item{hull_loss}{Simulated positive aircraft physical-damage cost at the accident-date price level.}
 }

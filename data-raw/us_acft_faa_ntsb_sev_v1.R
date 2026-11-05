@@ -36,13 +36,16 @@ severity <- merge(
   all.x = TRUE,
   sort = FALSE
 )
+severity[, accident_year := as.integer(format(accident_date, "%Y"))]
 setcolorder(severity, c(
-  "claim_id", "unique_id_line", "accident_date", features, "fold", "hull_loss"
+  "claim_id", "unique_id_line", "accident_date", "accident_year",
+  features, "fold", "hull_loss"
 ))
 setorder(severity, claim_id)
 
 if (anyDuplicated(severity$claim_id)) stop("Published claim IDs are not unique")
 if (anyNA(severity$accident_date)) stop("Every published claim must have an accident date")
+if (anyNA(severity$accident_year)) stop("Every published claim must have an accident year")
 if (anyNA(severity$hull_loss) || any(severity$hull_loss <= 0)) {
   stop("Every published claim must have one positive hull-loss severity")
 }

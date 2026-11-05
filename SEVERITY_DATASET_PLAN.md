@@ -137,7 +137,7 @@ Keep the components only in the audit data. Publish only the final target.
 
 1. start from the matched frequency-v2 rows rather than rebuilding its columns independently;
 2. reuse the frequency-v2 column selection and cleaning for every shared rating factor;
-3. add the accident date, severity target and stable event-aircraft identifier;
+3. add the accident date, numeric accident year, severity target and stable event-aircraft identifier;
 4. remove leakage and audit-only fields;
 5. write `inst/extdata/us_acft_faa_ntsb_sev_v1.parquet`;
 6. produce a reconciliation and simulation-quality report.
