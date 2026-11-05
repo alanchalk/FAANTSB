@@ -28,6 +28,17 @@ stopifnot(
   !any(c("damage", "damage_ratio", "synthetic_aircraft_value") %chin% names(severity))
 )
 
+age_check <- merge(
+  severity[, .(claim_id, acft_age)],
+  audit[, .(claim_id, expected_age = as.integer(pmin(50, pmax(0, value_age))))],
+  by = "claim_id",
+  all.x = TRUE
+)
+stopifnot(
+  !anyNA(age_check$expected_age),
+  all(age_check$acft_age == age_check$expected_age)
+)
+
 fold_check <- merge(
   severity[, .(unique_id_line, severity_fold = fold)],
   unique(frequency[, .(unique_id_line, frequency_fold = fold)]),

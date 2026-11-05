@@ -1,7 +1,7 @@
 # data-raw/us_acft_faa_ntsb_freq_v2.R
 #
 # Reproducible build of the `us_acft_faa_ntsb_freq_v2` dataset -- the cleaned
-# variant of v1. Identical to v1 in every respect EXCEPT `region`:
+# variant of v1. It corrects two known data-quality problems in v1:
 #
 #   v1 leaves the FAA region blank for deregistered aircraft, stored as "X".
 #       Because "X" is exactly the dereg data source, it is a leak: a model can
@@ -9,6 +9,9 @@
 #       keeps this deliberately, as a teaching trap.
 #   v2 resolves those blanks from `state` (master aircraft give a near-perfect
 #       state -> region map), so `region` is honest geography with no source leak.
+#
+# `acft_age` uses manufacture year when the FAA supplies it. Only records with
+# no manufacture year fall back to certificate tenure, which is the v1 measure.
 #
 # Everything else -- the seed-2024 24% sample, the deterministic folds, freq_cl,
 # zip lat/lon, the type/representation choices, the type_registrant int trap --
@@ -88,10 +91,105 @@ setnames(dt_zip, c("zip5", "lat", "lon"))
 dt_zip <- unique(dt_zip, by = "zip5")
 dt <- merge(dt, dt_zip, by = "zip5", all.x = TRUE, all.y = FALSE, sort = FALSE)
 
-# ---- 6. drop date columns, rename ----
+# ---- 6. calculate aircraft age, then drop source dates ----
+dt[, `:=`(
+  exposure_year = as.integer(format(start_date, "%Y")),
+  certificate_year = as.integer(format(cert_issue_date, "%Y"))
+)]
+dt[, certificate_age := exposure_year - certificate_year]
+
+# Learn the missing-year fallback from one row per aircraft registration. Using
+# annual rows would count the same aircraft repeatedly and overstate support.
+age_training <- dt[
+  !is.na(year_mfr) & !is.na(certificate_age) & exposure_year >= year_mfr
+]
+setorder(age_training, unique_id_ac, start_date)
+age_training <- age_training[, .SD[1L], by = unique_id_ac]
+age_training[, actual_age := exposure_year - year_mfr]
+
+global_age_fit <- lm(actual_age ~ certificate_age, data = age_training)
+global_age_intercept <- unname(coef(global_age_fit)[1L])
+global_age_beta <- unname(coef(global_age_fit)[2L])
+
+model_age_stats <- age_training[, .(
+  model_age_n = .N,
+  model_mean_age = mean(actual_age),
+  model_mean_certificate_age = mean(certificate_age)
+), by = .(faa_acft_make, faa_acft_model)]
+
+model_age_fits <- age_training[, {
+  fit <- if (.N >= 20L && uniqueN(certificate_age) >= 2L) {
+    lm(actual_age ~ certificate_age)
+  } else {
+    NULL
+  }
+  .(
+    model_age_intercept = if (is.null(fit)) NA_real_ else unname(coef(fit)[1L]),
+    model_age_beta = if (is.null(fit)) NA_real_ else unname(coef(fit)[2L])
+  )
+}, by = .(faa_acft_make, faa_acft_model)]
+
+make_age_stats <- age_training[, .(
+  make_age_n = .N,
+  make_mean_age = mean(actual_age),
+  make_mean_certificate_age = mean(certificate_age)
+), by = faa_acft_make]
+
+dt[model_age_stats, on = .(faa_acft_make, faa_acft_model), `:=`(
+  model_age_n = i.model_age_n,
+  model_mean_age = i.model_mean_age,
+  model_mean_certificate_age = i.model_mean_certificate_age
+)]
+dt[model_age_fits, on = .(faa_acft_make, faa_acft_model), `:=`(
+  model_age_intercept = i.model_age_intercept,
+  model_age_beta = i.model_age_beta
+)]
+dt[make_age_stats, on = .(faa_acft_make), `:=`(
+  make_age_n = i.make_age_n,
+  make_mean_age = i.make_mean_age,
+  make_mean_certificate_age = i.make_mean_certificate_age
+)]
+
+dt[, global_age_prediction :=
+  global_age_intercept + global_age_beta * certificate_age]
+dt[, make_age_prediction :=
+  make_mean_age + global_age_beta * (certificate_age - make_mean_certificate_age)]
+dt[, model_age_prediction :=
+  model_mean_age + global_age_beta * (certificate_age - model_mean_certificate_age)]
+
+# Sparse make/model averages are shrunk towards the make-level prediction.
+dt[, model_weight := model_age_n / (model_age_n + 10)]
+dt[, sparse_model_prediction :=
+  model_weight * model_age_prediction + (1 - model_weight) * make_age_prediction]
+
+dt[, age_source := fcase(
+  !is.na(year_mfr) & exposure_year >= year_mfr, "faa_manufacture_year",
+  !is.na(model_age_intercept), "make_model_regression",
+  !is.na(model_age_prediction) & !is.na(make_age_prediction), "make_model_shrunk",
+  !is.na(make_age_prediction), "make_average",
+  default = "global_regression"
+)]
+dt[, acft_age := fcase(
+  age_source == "faa_manufacture_year", as.numeric(exposure_year - year_mfr),
+  age_source == "make_model_regression",
+    model_age_intercept + model_age_beta * certificate_age,
+  age_source == "make_model_shrunk", sparse_model_prediction,
+  age_source == "make_average", make_age_prediction,
+  default = global_age_prediction
+)]
+dt[, acft_age := as.integer(round(pmax(0, pmin(50, acft_age))))]
+if (anyNA(dt$acft_age)) stop("Aircraft-age imputation left missing values")
+
+print(dt[, .N, by = age_source][order(-N)])
+
 dt[, c("year_mfr", "last_action_date", "cert_issue_date",
-       "air_worth_date", "expiration_date") := NULL]
-setnames(dt, "veh_age", "acft_age")
+       "air_worth_date", "expiration_date", "veh_age",
+       "exposure_year", "certificate_year", "certificate_age",
+       "model_age_n", "model_mean_age", "model_mean_certificate_age",
+       "model_age_intercept", "model_age_beta", "make_age_n",
+       "make_mean_age", "make_mean_certificate_age", "global_age_prediction",
+       "make_age_prediction", "model_age_prediction", "model_weight",
+       "sparse_model_prediction", "age_source") := NULL]
 
 # ---- 6b. deliberate column representations (same as v1) ----
 factor_cols <- names(dt)[vapply(dt, is.factor, logical(1))]
