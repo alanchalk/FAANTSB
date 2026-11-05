@@ -45,12 +45,12 @@ It contains:
 
 - the simulated hull-loss target;
 - simulated hull value at the accident-date price level;
-- hull loss as a proportion of that value, as an alternative target;
+- damage ratio (hull loss as a proportion of that value), as an alternative target;
 - the matched frequency-v2 row identifier and inherited fold;
 - only pre-event FAA rating factors;
 - the same names, types, category cleaning and levels as the corresponding frequency-v2 columns.
 
-It must not publish NTSB damage class as a modelling column. Deregistration-derived fields must also be excluded because destruction can itself cause deregistration. Hull value is known before the loss and is published with the corresponding loss ratio so students can compare monetary severity and loss-ratio models. The amount and ratio are alternative targets and must not be used to predict each other.
+It must not publish NTSB damage class as a modelling column. Deregistration-derived fields must also be excluded because destruction can itself cause deregistration. Hull value is known before the loss and is published with the corresponding damage ratio so students can compare monetary severity and damage-ratio models. The amount and ratio are alternative targets and must not be used to predict each other.
 
 ### Audit dataset
 
@@ -166,7 +166,7 @@ The catalogue documentation must identify the target as simulated and explain it
 - Synthetic values decline sensibly with age within comparable aircraft classes.
 - Loss amounts overlap substantially within and between aircraft classes rather than being recoverable from the published predictors.
 - The fixed reference Gamma model's held-out PR-squared is within the chosen 20–32% range.
-- Loss ratios and loss amounts are plausible by audit-only damage class and aircraft category.
+- Damage ratios and loss amounts are plausible by audit-only damage class and aircraft category.
 - Re-running from the same frozen sources produces identical rows, folds and simulated losses.
 - GLMStudio imports the catalogue dataset with the intended Gamma/log/no-weight configuration.
 

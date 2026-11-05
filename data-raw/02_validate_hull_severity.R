@@ -27,14 +27,14 @@ stopifnot(
   all(severity$hull_loss > 0),
   !anyNA(severity$hull_value),
   all(severity$hull_value > 0),
-  !anyNA(severity$hull_loss_ratio),
-  all(severity$hull_loss_ratio > 0 & severity$hull_loss_ratio <= 1),
+  !anyNA(severity$damage_ratio),
+  all(severity$damage_ratio > 0 & severity$damage_ratio <= 1),
   isTRUE(all.equal(
-    severity$hull_loss_ratio,
+    severity$damage_ratio,
     severity$hull_loss / severity$hull_value,
     tolerance = 1e-12
   )),
-  !any(c("damage", "damage_ratio", "synthetic_aircraft_value") %chin% names(severity))
+  !any(c("damage", "synthetic_aircraft_value") %chin% names(severity))
 )
 
 age_check <- merge(

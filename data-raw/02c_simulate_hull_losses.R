@@ -91,16 +91,15 @@ claims[, inflation_factor := fifelse(
 )]
 claims[, hull_loss := round(hull_loss_latest_price_level * inflation_factor, -1)]
 claims[, hull_loss := pmin(hull_loss, hull_value)]
-claims[, hull_loss_ratio := hull_loss / hull_value]
-claims[, damage_ratio := hull_loss_ratio]
+claims[, damage_ratio := hull_loss / hull_value]
 
 if (anyNA(claims$hull_loss)) stop("One or more claims have no simulated severity")
 if (any(claims$hull_loss <= 0)) stop("Every simulated severity must be positive")
 if (anyNA(claims$hull_value) || any(claims$hull_value <= 0)) {
   stop("Every claim must have one positive accident-date hull value")
 }
-if (any(claims$hull_loss_ratio <= 0 | claims$hull_loss_ratio > 1)) {
-  stop("Hull loss ratios must be in (0, 1]")
+if (any(claims$damage_ratio <= 0 | claims$damage_ratio > 1)) {
+  stop("Damage ratios must be in (0, 1]")
 }
 
 summary_by_damage <- claims[, .(
