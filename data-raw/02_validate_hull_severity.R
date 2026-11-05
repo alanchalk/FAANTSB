@@ -39,7 +39,7 @@ stopifnot(
 
 age_check <- merge(
   severity[, .(claim_id, acft_age)],
-  audit[, .(claim_id, expected_age = as.integer(pmin(50, pmax(0, value_age))))],
+  audit[, .(claim_id, expected_age = as.integer(pmin(80, pmax(0, value_age))))],
   by = "claim_id",
   all.x = TRUE
 )

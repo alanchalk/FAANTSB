@@ -45,7 +45,7 @@ severity <- merge(
   sort = FALSE
 )
 severity[, accident_year := as.integer(format(accident_date, "%Y"))]
-severity[, acft_age := as.integer(pmin(50, pmax(0, acft_age_at_accident)))]
+severity[, acft_age := as.integer(pmin(80, pmax(0, acft_age_at_accident)))]
 severity[, acft_age_at_accident := NULL]
 setcolorder(severity, c(
   "claim_id", "unique_id_line", "accident_date", "accident_year",

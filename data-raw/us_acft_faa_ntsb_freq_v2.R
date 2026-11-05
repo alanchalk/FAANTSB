@@ -177,7 +177,7 @@ dt[, acft_age := fcase(
   age_source == "make_average", make_age_prediction,
   default = global_age_prediction
 )]
-dt[, acft_age := as.integer(round(pmax(0, pmin(50, acft_age))))]
+dt[, acft_age := as.integer(round(pmax(0, pmin(80, acft_age))))]
 if (anyNA(dt$acft_age)) stop("Aircraft-age imputation left missing values")
 
 print(dt[, .N, by = age_source][order(-N)])
