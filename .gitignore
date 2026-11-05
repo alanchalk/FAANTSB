@@ -4,6 +4,7 @@
 .httr-oauth
 .DS_Store
 .quarto
+rawdata/
 /data-raw/*
 !/data-raw/*.R
 !/data-raw/*.py
