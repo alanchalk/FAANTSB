@@ -74,6 +74,35 @@ stopifnot(
   all(claim_count_check$severity_claims == claim_count_check$frequency_claims)
 )
 
+# Frequency v2 carries the hull columns that let a frequency and a severity
+# model be combined and tested on the same rows (03_add_hull_columns_to_freq_v2.R).
+hull_columns <- c("hull_value", "hull_loss", "damage_ratio")
+if (!all(hull_columns %chin% names(frequency))) {
+  stop("Frequency v2 has no hull columns: run 03_add_hull_columns_to_freq_v2.R")
+}
+row_check <- merge(
+  frequency[, .(unique_id_line, nu_cl, hull_value, hull_loss, damage_ratio)],
+  severity[, .(
+    severity_loss = sum(hull_loss),
+    severity_ratio = sum(damage_ratio) / .N
+  ), by = unique_id_line],
+  by = "unique_id_line",
+  all.x = TRUE
+)
+row_check[is.na(severity_loss), `:=`(severity_loss = 0, severity_ratio = 0)]
+stopifnot(
+  !anyNA(frequency$hull_value),
+  all(frequency$hull_value > 0),
+  all(row_check$hull_loss == row_check$severity_loss),
+  all(row_check$damage_ratio == row_check$severity_ratio),
+  all(row_check[nu_cl == 0, hull_loss == 0 & damage_ratio == 0]),
+  sum(frequency$hull_loss) == sum(severity$hull_loss),
+  isTRUE(all.equal(
+    sum(frequency$nu_cl * frequency$damage_ratio), sum(severity$damage_ratio),
+    tolerance = 1e-12
+  ))
+)
+
 gamma_deviance <- function(actual, predicted) {
   sum(2 * ((actual - predicted) / predicted - log(actual / predicted)))
 }
@@ -97,6 +126,6 @@ holdout_pr2 <- 1 - gamma_deviance(holdout$hull_loss, holdout_prediction) /
 stopifnot(holdout_pr2 >= 0.20, holdout_pr2 <= 0.32)
 
 cat(sprintf(
-  "validated %d claims; held-out Gamma PR-squared %.3f; all folds inherited\n",
+  "validated %d claims; held-out Gamma PR-squared %.3f; all folds inherited; frequency v2 hull columns reconcile\n",
   nrow(severity), holdout_pr2
 ))

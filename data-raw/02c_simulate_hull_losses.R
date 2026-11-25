@@ -6,18 +6,9 @@ suppressMessages({
 })
 
 root <- Sys.getenv("FAANTSB_ROOT", unset = ".")
+source(file.path(root, "data-raw", "hull_value_functions.R"))
 derived_dir <- file.path(root, "data-raw", "derived")
 claims <- as.data.table(readRDS(file.path(derived_dir, "dt_faa_ntsb_hull_values.rds")))
-
-stable_uniform <- function(key, salt) {
-  hash <- vapply(
-    paste0(key, "|", salt),
-    digest2int,
-    integer(1),
-    USE.NAMES = FALSE
-  )
-  (as.numeric(hash) + 2147483648.5) / 4294967296
-}
 
 claims[, total_loss_probability := fcase(
   damage == "DEST", 0.95,
@@ -55,24 +46,13 @@ claims[, hull_loss_latest_price_level := pmax(500, pmin(
 ))]
 
 # Express each claim at its accident-date price level using US aircraft PPIs.
-replacement_index <- fread(file.path(root, "rawdata", "BLS", "WPU142.csv"))
-repair_index <- fread(file.path(root, "rawdata", "BLS", "WPU5541.csv"))
-setnames(replacement_index, c("date", "index"))
-setnames(repair_index, c("date", "index"))
-replacement_index[, date := as.IDate(date)]
-repair_index[, date := as.IDate(date)]
-
-index_at <- function(dates, index_table) {
-  positions <- findInterval(as.IDate(dates), index_table$date)
-  if (any(positions == 0)) stop("Price index does not cover all accident dates")
-  index_table$index[positions]
-}
+replacement_index <- read_price_index(root, "WPU142")
+repair_index <- read_price_index(root, "WPU5541")
 
 replacement_at_accident <- index_at(claims$ev_date, replacement_index)
 replacement_factor <- replacement_at_accident / tail(replacement_index$index, 1)
-claims[, hull_value := round(
-  pmax(500, synthetic_aircraft_value * replacement_factor),
-  -2
+claims[, hull_value := hull_value_at(
+  synthetic_aircraft_value, ev_date, replacement_index
 )]
 
 # The repair series begins in April 2009. Backcast the earlier months using

@@ -23,6 +23,28 @@ Total-loss costs rise with aircraft value with an elasticity of 0.78. A broad cl
 
 Claim amounts are converted to their accident-date price level using two US Bureau of Labor Statistics Producer Price Index series: `WPU142`, Aircraft and aircraft equipment, for total losses; and `WPU5541`, Aircraft repair and maintenance, for partial repairs. Each is rebased to its latest frozen observation. The repair series begins in April 2009, so the earlier 2008–March 2009 values are backcast using `WPU142`, anchored to the first repair observation. The published `accident_date` allows losses to be restated to another common price level; `accident_year` is the corresponding numeric modelling feature.
 
-A fixed Gamma/log reference GLM fitted only to published pre-event factors has a held-out PR-squared of about 0.25. Thus aircraft characteristics provide a useful pricing signal without making the simulated claim cost nearly deterministic.
+A fixed Gamma/log reference GLM fitted only to published pre-event factors has a held-out PR-squared of about 0.32; the validation script requires 0.20 to 0.32. Thus aircraft characteristics provide a useful pricing signal without making the simulated claim cost nearly deterministic.
 
-Aircraft value, damage ratio, damage class and the total-loss indicator remain in the local audit object and are excluded from the published modelling data. Stable hashes of the aircraft or claim identifier generate every random draw, so repeated builds are identical.
+The published severity data includes the accident-date `hull_value` and `damage_ratio` (`hull_loss / hull_value`) as an alternative severity formulation. Damage class, the total-loss indicator and the latest-price-level aircraft value remain in the local audit object only. Stable hashes of the aircraft or claim identifier generate every random draw, so repeated builds are identical.
+
+## Hull columns in frequency v2
+
+Frequency v2 carries three hull columns so a frequency model and a severity model can be combined and tested on the same rows against actual losses.
+
+- `hull_value`, on every row, is the aircraft value at the start of the exposure period, as an underwriter would fix it at inception. It uses the same value formula and value uncertainty as the severity data, with the aircraft's age in the exposure year and the `WPU142` index on `start_date`.
+- `hull_loss` is the total severity-v1 hull loss of the row's claims, and zero on rows without a claim.
+- `damage_ratio` is the average severity-v1 damage ratio of the row's claims, and zero on rows without a claim. A severity model can be fitted to it on the claim rows weighted by `nu_cl`, as `freq_cl` is weighted by `ex`.
+
+On single-claim rows `hull_loss` and `damage_ratio` equal the severity values exactly. Two aircraft-years have two claims; their row holds the total loss and the average damage ratio. Total `hull_loss`, and `damage_ratio` weighted by `nu_cl`, reconcile exactly with the severity data.
+
+`hull_value` deliberately differs from the severity value on claim rows. The severity value is fixed at the accident date, so using it would let a pre-loss rating factor reveal when a claim happened. The inception value is typically within 5% of the accident-date value. A loss can therefore slightly exceed the inception value, mainly for total losses after prices have risen.
+
+## Build order
+
+1. `us_acft_faa_ntsb_freq_v2.R`
+2. `02a_build_hull_claims.R`, `02b_build_synthetic_values.R`, `02c_simulate_hull_losses.R`
+3. `us_acft_faa_ntsb_sev_v1.R`
+4. `03_add_hull_columns_to_freq_v2.R`
+5. `02_validate_hull_severity.R`
+
+Step 1 rewrites frequency v2 without the hull columns, so steps 2 to 5 must follow it. The value formula and price-index functions shared by steps 2 and 4 are in `data-raw/hull_value_functions.R`.
